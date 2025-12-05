@@ -1,14 +1,20 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Scale, Phone } from "lucide-react";
+import { Menu, X, Scale, Phone, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
-  { href: "/team", label: "Attorneys" },
+  { href: "/blog", label: "Blog" },
   { href: "/cases", label: "Case Studies" },
   { href: "/contact", label: "Contact" },
 ];
