@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 const quickLinks = [
   { label: "About Us", href: "/about" },
   { label: "Our Services", href: "/services" },
+  { label: "Blog", href: "/blog" },
   { label: "Our Team", href: "/team" },
   { label: "Case Studies", href: "/cases" },
   { label: "Contact Us", href: "/contact" },

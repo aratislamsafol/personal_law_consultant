@@ -22,6 +22,7 @@ const navLinks = [
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [location] = useLocation();
 
   useEffect(() => {
@@ -81,6 +82,15 @@ export function Header() {
           <div className="hidden lg:flex items-center gap-4">
             <ThemeToggle />
             <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setIsSearchOpen(true)}
+              className={isScrolled ? "text-foreground" : "text-white"}
+              data-testid="button-search"
+            >
+              <Search className="w-5 h-5" />
+            </Button>
+            <Button 
               className="gap-2"
               data-testid="button-consultation"
             >
@@ -137,6 +147,22 @@ export function Header() {
           </div>
         )}
       </div>
+
+      <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle>Search</DialogTitle>
+          <div className="flex items-center gap-2">
+            <Input 
+              placeholder="Search..." 
+              className="flex-1"
+              data-testid="input-search"
+            />
+            <Button data-testid="button-search-submit">
+              <Search className="w-4 h-4" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
