@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Briefcase, Users, Smile, Award, AlertCircle } from "lucide-react";
-import { useCounterStats } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { CounterSkeleton } from "@/components/loading-skeleton";
 import type { CounterStat } from "@/lib/types";
 
@@ -53,7 +53,17 @@ function CounterItem({ stat, isVisible }: { stat: CounterStat; isVisible: boolea
 export function CounterSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const { data: stats, isLoading, error } = useCounterStats();
+  const { counterStats, isLoading, errors, fetchCounterStats } = useDataStore();
+  
+  const stats = counterStats;
+  const isLoadingStats = isLoading.counterStats;
+  const error = errors.counterStats;
+
+  useEffect(() => {
+    if (counterStats.length === 0) {
+      fetchCounterStats();
+    }
+  }, [counterStats.length, fetchCounterStats]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -80,7 +90,7 @@ export function CounterSection() {
       data-testid="counter-section"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {isLoading && <CounterSkeleton />}
+        {isLoadingStats && <CounterSkeleton />}
 
         {error && (
           <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">

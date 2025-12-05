@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Star, Users, ChevronDown, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useHeroSlides } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { HeroSkeleton } from "@/components/loading-skeleton";
 import heroImage1 from "@assets/stock_images/professional_lawyer__eba13785.jpg";
 import heroImage2 from "@assets/stock_images/professional_lawyer__d92a2da9.jpg";
@@ -14,9 +14,18 @@ const localImages: Record<string, string> = {
 };
 
 export function HeroSection() {
-  const { data: heroSlides, isLoading, error } = useHeroSlides();
+  const { heroSlides, isLoading, errors, fetchHeroSlides } = useDataStore();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  const isLoadingHero = isLoading.heroSlides;
+  const error = errors.heroSlides;
+
+  useEffect(() => {
+    if (heroSlides.length === 0) {
+      fetchHeroSlides();
+    }
+  }, [heroSlides.length, fetchHeroSlides]);
 
   const getImage = (apiPath: string) => localImages[apiPath] || apiPath;
 
@@ -51,7 +60,7 @@ export function HeroSection() {
     });
   };
 
-  if (isLoading) {
+  if (isLoadingHero) {
     return <HeroSkeleton />;
   }
 

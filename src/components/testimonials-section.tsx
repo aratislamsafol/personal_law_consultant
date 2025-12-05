@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Quote, Star, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useTestimonials } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { TestimonialsSkeleton } from "@/components/loading-skeleton";
 import testimonialImage1 from "@assets/stock_images/professional_busines_06595957.jpg";
@@ -17,9 +17,18 @@ const localImages: Record<string, string> = {
 
 export function TestimonialsSection() {
   const { ref, isVisible } = useScrollReveal();
-  const { data: testimonials, isLoading, error } = useTestimonials();
+  const { testimonials, isLoading, errors, fetchTestimonials } = useDataStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  const isLoadingTestimonials = isLoading.testimonials;
+  const error = errors.testimonials;
+
+  useEffect(() => {
+    if (testimonials.length === 0) {
+      fetchTestimonials();
+    }
+  }, [testimonials.length, fetchTestimonials]);
 
   const getImage = (apiPath: string) => localImages[apiPath] || apiPath;
 
@@ -31,6 +40,7 @@ export function TestimonialsSection() {
     }, 8000);
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, testimonials]);
 
   const handleNext = () => {
@@ -70,7 +80,7 @@ export function TestimonialsSection() {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          {isLoading && <TestimonialsSkeleton />}
+          {isLoadingTestimonials && <TestimonialsSkeleton />}
 
           {error && (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">

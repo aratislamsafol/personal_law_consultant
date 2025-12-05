@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Check, Award, Users, Briefcase, Target } from "lucide-react";
-import { useTeamMembers, useCounterStats } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import aboutImage1 from "@assets/stock_images/attorney_lawyer_meet_7b9f60e8.jpg";
 import aboutImage2 from "@assets/stock_images/attorney_lawyer_meet_586a7e16.jpg";
 import aboutImage3 from "@assets/stock_images/modern_law_office_in_7183b75a.jpg";
@@ -52,9 +53,18 @@ const milestones = [
 ];
 
 export default function About() {
-  const { data: teamMembers } = useTeamMembers();
-  const { data: stats } = useCounterStats();
+  const { teamMembers, counterStats, fetchTeamMembers, fetchCounterStats } = useDataStore();
+  const stats = counterStats;
   const getImage = (apiPath: string) => localImages[apiPath] || apiPath;
+
+  useEffect(() => {
+    if (teamMembers.length === 0) {
+      fetchTeamMembers();
+    }
+    if (counterStats.length === 0) {
+      fetchCounterStats();
+    }
+  }, [teamMembers.length, counterStats.length, fetchTeamMembers, fetchCounterStats]);
 
   return (
     <div className="min-h-screen" data-testid="page-about">

@@ -1,9 +1,10 @@
+import { useEffect } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shield, Building, Heart, Home, Activity, HeartPulse, ArrowRight, Phone, Check } from "lucide-react";
-import { useServices } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { Link } from "wouter";
 
 const iconMap: Record<string, typeof Shield> = {
@@ -43,7 +44,13 @@ const serviceDetails: Record<string, { features: string[]; description: string }
 };
 
 export default function Services() {
-  const { data: services } = useServices();
+  const { services, fetchServices } = useDataStore();
+
+  useEffect(() => {
+    if (services.length === 0) {
+      fetchServices();
+    }
+  }, [services.length, fetchServices]);
 
   return (
     <div className="min-h-screen" data-testid="page-services">

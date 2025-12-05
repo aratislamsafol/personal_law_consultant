@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import { ArrowRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTeamMembers } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { TeamSkeleton } from "@/components/loading-skeleton";
 import teamMale1 from "@assets/stock_images/professional_busines_7419220b.jpg";
@@ -19,7 +20,16 @@ const localImages: Record<string, string> = {
 
 export function TeamSection() {
   const { ref, isVisible } = useScrollReveal();
-  const { data: teamMembers, isLoading, error } = useTeamMembers();
+  const { teamMembers, isLoading, errors, fetchTeamMembers } = useDataStore();
+  
+  const isLoadingTeam = isLoading.teamMembers;
+  const error = errors.teamMembers;
+
+  useEffect(() => {
+    if (teamMembers.length === 0) {
+      fetchTeamMembers();
+    }
+  }, [teamMembers.length, fetchTeamMembers]);
   
   const getImage = (apiPath: string) => localImages[apiPath] || apiPath;
   const duplicatedMembers = teamMembers ? [...teamMembers, ...teamMembers] : [];
@@ -51,7 +61,7 @@ export function TeamSection() {
       </div>
 
       <div className="relative">
-        {isLoading && <TeamSkeleton />}
+        {isLoadingTeam && <TeamSkeleton />}
 
         {error && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">

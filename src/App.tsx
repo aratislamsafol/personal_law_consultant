@@ -1,9 +1,9 @@
+import { useEffect } from "react";
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { useDataStore } from "@/stores/data-store";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Services from "@/pages/services";
@@ -27,14 +27,19 @@ function Router() {
 }
 
 function App() {
+  const { fetchAll } = useDataStore();
+
+  useEffect(() => {
+    // Initialize data on app mount
+    fetchAll();
+  }, [fetchAll]);
+
   return (
     <ThemeProvider defaultTheme="light" storageKey="ensaf-theme">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </QueryClientProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
     </ThemeProvider>
   );
 }

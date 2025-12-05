@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import { Check, ArrowRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAboutFeatures } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { AboutSkeleton } from "@/components/loading-skeleton";
 import aboutImage1 from "@assets/stock_images/attorney_lawyer_meet_7b9f60e8.jpg";
@@ -15,7 +16,16 @@ const aboutImages = {
 
 export function AboutSection() {
   const { ref, isVisible } = useScrollReveal();
-  const { data: aboutFeatures, isLoading, error } = useAboutFeatures();
+  const { aboutFeatures, isLoading, errors, fetchAboutFeatures } = useDataStore();
+  
+  const isLoadingAbout = isLoading.aboutFeatures;
+  const error = errors.aboutFeatures;
+
+  useEffect(() => {
+    if (aboutFeatures.length === 0) {
+      fetchAboutFeatures();
+    }
+  }, [aboutFeatures.length, fetchAboutFeatures]);
 
   return (
     <section 
@@ -78,7 +88,7 @@ export function AboutSection() {
               legal solutions for all your needs.
             </p>
 
-            {isLoading && <AboutSkeleton />}
+            {isLoadingAbout && <AboutSkeleton />}
 
             {error && (
               <div className="flex items-center gap-2 text-muted-foreground mb-8">

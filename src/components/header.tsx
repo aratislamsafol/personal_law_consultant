@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Scale, Phone, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useUIStore } from "@/stores/ui-store";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -20,10 +21,9 @@ const navLinks = [
 ];
 
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { isScrolled, isMobileMenuOpen, isSearchOpen, setIsScrolled, setMobileMenuOpen, setSearchOpen } = useUIStore();
   const [location] = useLocation();
+  const isHomePage = location === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,18 +32,18 @@ export function Header() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [setIsScrolled]);
 
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location]);
+    setMobileMenuOpen(false);
+  }, [location, setMobileMenuOpen]);
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/95 backdrop-blur-md shadow-lg"
-          : "bg-transparent"
+        isHomePage && !isScrolled
+          ? "bg-transparent"
+          : "bg-background/95 backdrop-blur-md shadow-lg"
       }`}
       data-testid="header"
     >
@@ -54,7 +54,7 @@ export function Header() {
               <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
                 <Scale className="w-6 h-6 text-white" />
               </div>
-              <span className={`font-serif text-2xl font-bold ${isScrolled ? "text-foreground" : "text-white"}`}>
+              <span className={`font-serif text-2xl font-bold ${isHomePage && !isScrolled ? "text-white" : "text-foreground"}`}>
                 Ensaf
               </span>
             </div>
@@ -67,9 +67,9 @@ export function Header() {
                   className={`text-sm font-medium transition-colors cursor-pointer ${
                     location === link.href
                       ? "text-primary"
-                      : isScrolled
-                      ? "text-foreground/80 hover:text-primary"
-                      : "text-white/80 hover:text-white"
+                      : isHomePage && !isScrolled
+                      ? "text-white/80 hover:text-white"
+                      : "text-foreground/80 hover:text-primary"
                   }`}
                   data-testid={`link-nav-${link.label.toLowerCase()}`}
                 >
@@ -80,15 +80,15 @@ export function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">
-            <ThemeToggle />
+            <ThemeToggle className={isHomePage && !isScrolled ? "text-white/80 hover:text-white" : "text-foreground hover:text-foreground"} />
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => setIsSearchOpen(true)}
-              className={isScrolled ? "text-foreground" : "text-white"}
+              onClick={() => setSearchOpen(true)}
+              className={isHomePage && !isScrolled ? "text-white hover:text-white" : "text-foreground hover:text-foreground"}
               data-testid="button-search"
             >
-              <Search className="w-5 h-5" />
+              <Search className={`w-5 h-5 ${isHomePage && !isScrolled ? "text-white" : "text-foreground"}`} />
             </Button>
             <Button 
               className="gap-2"
@@ -100,12 +100,12 @@ export function Header() {
           </div>
 
           <div className="lg:hidden flex items-center gap-2">
-            <ThemeToggle />
+            <ThemeToggle className={isHomePage && !isScrolled ? "text-white/80 hover:text-white" : "text-foreground hover:text-foreground"} />
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={isScrolled ? "text-foreground" : "text-white"}
+              onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+              className={isHomePage && !isScrolled ? "text-white" : "text-foreground"}
               data-testid="button-mobile-menu"
             >
               {isMobileMenuOpen ? (
@@ -148,7 +148,7 @@ export function Header() {
         )}
       </div>
 
-      <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+      <Dialog open={isSearchOpen} onOpenChange={setSearchOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogTitle>Search</DialogTitle>
           <div className="flex items-center gap-2">

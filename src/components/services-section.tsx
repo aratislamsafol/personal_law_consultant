@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import { ArrowRight, Shield, Building, Heart, Home, Activity, HeartPulse, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useServices } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { ServicesSkeleton } from "@/components/loading-skeleton";
 
@@ -15,7 +16,16 @@ const iconMap: Record<string, typeof Shield> = {
 
 export function ServicesSection() {
   const { ref, isVisible } = useScrollReveal();
-  const { data: services, isLoading, error } = useServices();
+  const { services, isLoading, errors, fetchServices } = useDataStore();
+  
+  const isLoadingServices = isLoading.services;
+  const error = errors.services;
+
+  useEffect(() => {
+    if (services.length === 0) {
+      fetchServices();
+    }
+  }, [services.length, fetchServices]);
 
   return (
     <section
@@ -37,7 +47,7 @@ export function ServicesSection() {
           </h2>
         </div>
 
-        {isLoading && <ServicesSkeleton />}
+        {isLoadingServices && <ServicesSkeleton />}
 
         {error && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">

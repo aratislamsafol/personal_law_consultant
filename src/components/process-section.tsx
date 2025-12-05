@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { MessageCircle, Search, Target, AlertCircle } from "lucide-react";
-import { useProcessSteps } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { ProcessSkeleton } from "@/components/loading-skeleton";
 import processBackgroundImage from "@assets/stock_images/modern_law_office_in_2acbaaf1.jpg";
@@ -12,7 +13,16 @@ const iconMap: Record<string, typeof MessageCircle> = {
 
 export function ProcessSection() {
   const { ref, isVisible } = useScrollReveal();
-  const { data: processSteps, isLoading, error } = useProcessSteps();
+  const { processSteps, isLoading, errors, fetchProcessSteps } = useDataStore();
+  
+  const isLoadingProcess = isLoading.processSteps;
+  const error = errors.processSteps;
+
+  useEffect(() => {
+    if (processSteps.length === 0) {
+      fetchProcessSteps();
+    }
+  }, [processSteps.length, fetchProcessSteps]);
 
   return (
     <section
@@ -44,7 +54,7 @@ export function ProcessSection() {
               Navigating the Law: Your Assurance of Peace
             </h2>
 
-            {isLoading && <ProcessSkeleton />}
+            {isLoadingProcess && <ProcessSkeleton />}
 
             {error && (
               <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowUpRight, AlertCircle } from "lucide-react";
-import { useCaseStudies } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { CaseStudiesSkeleton } from "@/components/loading-skeleton";
 import {
@@ -30,8 +30,17 @@ const localImages: Record<string, string> = {
 
 export function CaseStudiesSection() {
   const { ref, isVisible } = useScrollReveal();
-  const { data: caseStudies, isLoading, error } = useCaseStudies();
+  const { caseStudies, isLoading, errors, fetchCaseStudies } = useDataStore();
   const [selectedCase, setSelectedCase] = useState<CaseStudy | null>(null);
+  
+  const isLoadingCases = isLoading.caseStudies;
+  const error = errors.caseStudies;
+
+  useEffect(() => {
+    if (caseStudies.length === 0) {
+      fetchCaseStudies();
+    }
+  }, [caseStudies.length, fetchCaseStudies]);
 
   const getImage = (apiPath: string) => localImages[apiPath] || apiPath;
 
@@ -55,7 +64,7 @@ export function CaseStudiesSection() {
           </h2>
         </div>
 
-        {isLoading && <CaseStudiesSkeleton />}
+        {isLoadingCases && <CaseStudiesSkeleton />}
 
         {error && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">

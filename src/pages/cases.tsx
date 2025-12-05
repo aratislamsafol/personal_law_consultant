@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, Filter } from "lucide-react";
-import { useCaseStudies } from "@/lib/api-hooks";
+import { useDataStore } from "@/stores/data-store";
 import {
   Dialog,
   DialogContent,
@@ -84,9 +84,15 @@ const caseDetails: Record<string, { challenge: string; approach: string; result:
 };
 
 export default function Cases() {
-  const { data: caseStudies } = useCaseStudies();
+  const { caseStudies, fetchCaseStudies } = useDataStore();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCase, setSelectedCase] = useState<CaseStudy | null>(null);
+
+  useEffect(() => {
+    if (caseStudies.length === 0) {
+      fetchCaseStudies();
+    }
+  }, [caseStudies.length, fetchCaseStudies]);
 
   const getImage = (apiPath: string) => localImages[apiPath] || apiPath;
 
